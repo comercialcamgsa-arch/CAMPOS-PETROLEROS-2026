@@ -1,0 +1,6 @@
+proyecto-mapa-golfo/
+├─ index.html
+├─ js/
+│   └─ mapa.js
+└─ geojson/
+    └─ mapa_pozos_puertos.geojson
