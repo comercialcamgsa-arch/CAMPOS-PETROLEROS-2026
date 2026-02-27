@@ -1,0 +1,97 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pozo Mar Abierto A1",
+        "operator": "Pemex",
+        "operator_type": "Pemex",
+        "aceite_bpd": 15000,
+        "gas_mmpcd": 30
+      },
+      "geometry": { "type": "Point", "coordinates": [-91.85, 20.40] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pozo Offshore B7",
+        "operator": "Shell",
+        "operator_type": "Privado",
+        "aceite_bpd": 9500,
+        "gas_mmpcd": 15
+      },
+      "geometry": { "type": "Point", "coordinates": [-92.10, 19.90] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pozo Mar Profundo C3",
+        "operator": "Woodside",
+        "operator_type": "Privado",
+        "aceite_bpd": 12000,
+        "gas_mmpcd": 20
+      },
+      "geometry": { "type": "Point", "coordinates": [-97.75, 22.50] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pozo Offshore D5",
+        "operator": "Fieldwood",
+        "operator_type": "Privado",
+        "aceite_bpd": 8000,
+        "gas_mmpcd": 10
+      },
+      "geometry": { "type": "Point", "coordinates": [-92.35, 19.75] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Dos Bocas",
+        "role": "Base logística principal petroquímica y offshore"
+      },
+      "geometry": { "type": "Point", "coordinates": [-93.19, 18.43] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Ciudad del Carmen",
+        "role": "Base logística y operaciones offshore"
+      },
+      "geometry": { "type": "Point", "coordinates": [-91.83, 18.65] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Coatzacoalcos",
+        "role": "Soporte y suministro"
+      },
+      "geometry": { "type": "Point", "coordinates": [-94.42, 18.15] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Tuxpan",
+        "role": "Apoyo logístico y suministro"
+      },
+      "geometry": { "type": "Point", "coordinates": [-97.41, 21.15] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Altamira",
+        "role": "Base logística para Trion/Woodside"
+      },
+      "geometry": { "type": "Point", "coordinates": [-97.85, 22.4833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Tampico",
+        "role": "Apoyo logístico"
+      },
+      "geometry": { "type": "Point", "coordinates": [-97.85, 22.25] }
+    }
+  ]
+}
