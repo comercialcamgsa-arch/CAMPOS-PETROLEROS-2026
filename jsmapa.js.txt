@@ -1,0 +1,89 @@
+let map;
+let allFeatures = [];
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 20.0, lng: -92.0 },
+    zoom: 6
+  });
+
+  // Cargar GeoJSON
+  map.data.loadGeoJson('geojson/mapa_pozos_puertos.geojson', null, function(features) {
+    allFeatures = features;
+    updateMap();
+  });
+
+  // InfoWindow
+  const infoWindow = new google.maps.InfoWindow();
+  map.data.addListener('click', function(event) {
+    let content = '';
+    if (event.feature.getProperty('name')) {
+      content += `<strong>${event.feature.getProperty('name')}</strong><br>`;
+    }
+    if (event.feature.getProperty('operator')) {
+      content += `Operador: ${event.feature.getProperty('operator')}<br>`;
+      content += `Aceite: ${event.feature.getProperty('aceite_bpd') || 'N/A'} BPD<br>`;
+      content += `Gas: ${event.feature.getProperty('gas_mmpcd') || 'N/A'} MMPCD`;
+    }
+    if (event.feature.getProperty('role')) {
+      content += `Rol: ${event.feature.getProperty('role')}`;
+    }
+    infoWindow.setContent(content);
+    infoWindow.setPosition(event.latLng);
+    infoWindow.open(map);
+  });
+
+  // Eventos de filtro
+  const checkboxes = document.querySelectorAll('.filter');
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', updateMap);
+  });
+}
+
+function updateMap() {
+  const activeFilters = Array.from(document.querySelectorAll('.filter:checked')).map(cb => cb.value);
+
+  map.data.forEach(function(feature) {
+    const op = feature.getProperty('operator');
+    const puerto = feature.getProperty('role') ? 'Puertos' : null;
+
+    let show = false;
+    if (puerto && activeFilters.includes('Puertos')) show = true;
+    if (op && activeFilters.includes(op)) show = true;
+
+    map.data.overrideStyle(feature, {
+      visible: show,
+      icon: getIcon(feature)
+    });
+  });
+}
+
+function getIcon(feature) {
+  const op = feature.getProperty('operator');
+  const puerto = feature.getProperty('role');
+
+  let color = "#888888";
+  let scale = 6;
+  let path = google.maps.SymbolPath.CIRCLE;
+
+  if (puerto) { 
+    color = "#FFD700"; // amarillo para puertos
+    scale = 10;
+    path = google.maps.SymbolPath.BACKWARD_CLOSED_ARROW; // distinto para puertos
+  } else if (op === "Pemex") color = "#006341";
+  else if (op === "Shell") color = "#0033A0";
+  else if (op === "Woodside") color = "#FF8C00";
+  else if (op === "Fieldwood") color = "#FF0000";
+  else if (op === "Chevron") color = "#1E90FF";
+
+  return {
+    path: path,
+    scale: scale,
+    fillColor: color,
+    fillOpacity: 0.8,
+    strokeWeight: 1,
+    strokeColor: "#000"
+  };
+}
+
+google.maps.event.addDomListener(window, 'load', initMap);
