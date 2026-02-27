@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mapa Interactivo Pozos y Puertos - Golfo de México</title>
+  <title>Mapa Interactivo Pozos y Puertos</title>
   <style>
     #map { height: 90vh; width: 100%; }
     #controls {
@@ -12,8 +12,6 @@
       font-family: Arial, sans-serif;
     }
     .checkbox-item { margin-bottom: 5px; }
-    .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
-    .color-box { width: 20px; height: 20px; margin-right: 5px; }
   </style>
 </head>
 <body>
@@ -26,6 +24,7 @@
     <div class="checkbox-item"><input type="checkbox" class="filter" value="Chevron" checked> Chevron</div>
     <div class="checkbox-item"><input type="checkbox" class="filter" value="Puertos" checked> Puertos</div>
   </div>
+
   <div id="map"></div>
 
   <!-- Google Maps API -->
