@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ku-Maloob-Zaap 101",
+        "operator": "Pemex",
+        "aceite_bpd": 18000,
+        "gas_mmpcd": 25
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-91.75, 20.30]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Trion-1",
+        "operator": "Woodside",
+        "aceite_bpd": 0,
+        "gas_mmpcd": 0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-93.90, 25.20]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Ichalkil Field",
+        "operator": "Fieldwood",
+        "aceite_bpd": 12000,
+        "gas_mmpcd": 15
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-92.10, 19.80]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Puerto de Altamira",
+        "role": "Base logística Woodside - Trion"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-97.85, 22.48]
+      }
+    }
+
+  ]
+}
