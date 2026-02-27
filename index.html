@@ -1,96 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<title>Mapa Petrolero - Golfo de México</title>
-<style>
-body { margin:0; font-family: Arial; }
-#map { height:100vh; width:100%; }
-#panel {
-  position:absolute;
-  top:10px;
-  left:10px;
-  background:white;
-  padding:10px;
-  z-index:5;
-  border-radius:8px;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Mapa Interactivo Avanzado - Pozos y Puertos</title>
+  <style>
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+    #controls {
+      background: white;
+      padding: 10px;
+      margin: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .checkbox-item {
+      margin-bottom: 5px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .color-box {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+  </style>
 </head>
 <body>
+  <div id="controls">
+    <h3>Filtrar Operadores / Puertos</h3>
+    <div class="checkbox-item"><input type="checkbox" class="filter" value="Pemex" checked> Pemex</div>
+    <div class="checkbox-item"><input type="checkbox" class="filter" value="Shell" checked> Shell</div>
+    <div class="checkbox-item"><input type="checkbox" class="filter" value="Woodside" checked> Woodside</div>
+    <div class="checkbox-item"><input type="checkbox" class="filter" value="Fieldwood" checked> Fieldwood</div>
+    <div class="checkbox-item"><input type="checkbox" class="filter" value="Chevron" checked> Chevron</div>
+    <div class="checkbox-item"><input type="checkbox" class="filter" value="Puertos" checked> Puertos</div>
+  </div>
+  <div id="map"></div>
 
-<div id="panel">
-<b>Operador:</b>
-<select id="filtro">
-<option value="Todos">Todos</option>
-<option value="Pemex">Pemex</option>
-<option value="Privado">Privado</option>
-</select>
-</div>
-
-<div id="map"></div>
-
-<script>
-let map;
-let circulos = [];
-
-const datos = [
-  {nombre:"EK-Balam 1", operador:"Pemex", tipo:"Pemex", aceite:12000, gas:45, lat:20.55, lng:-91.94},
-  {nombre:"Area 1 ENI", operador:"ENI", tipo:"Privado", aceite:8000, gas:20, lat:19.80, lng:-92.20},
-  {nombre:"Puerto de Dos Bocas", operador:"Puerto", tipo:"Puerto", aceite:0, gas:0, lat:18.43, lng:-93.19},
-  {nombre:"Puerto Ciudad del Carmen", operador:"Puerto", tipo:"Puerto", aceite:0, gas:0, lat:18.65, lng:-91.83}
-];
-
-function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    center:{lat:21.5,lng:-91.5},
-    zoom:6,
-    mapTypeId:"satellite"
-  });
-  dibujar("Todos");
-  document.getElementById("filtro").addEventListener("change", function(){
-    dibujar(this.value);
-  });
-}
-
-function dibujar(filtro){
-  circulos.forEach(c=>c.setMap(null));
-  circulos=[];
-  
-  datos.forEach(d=>{
-    if(filtro!=="Todos" && d.tipo!==filtro) return;
-
-    let radio = d.tipo==="Puerto"? 5000 : Math.sqrt(d.aceite)*15;
-    let color = d.tipo==="Pemex"? "#006341" : d.tipo==="Privado"? "#0033A0" : "#FFD700";
-
-    let circle = new google.maps.Circle({
-      strokeColor: color,
-      strokeOpacity: 0.8,
-      strokeWeight: 1,
-      fillColor: color,
-      fillOpacity: 0.6,
-      map: map,
-      center: {lat:d.lat, lng:d.lng},
-      radius: radio
-    });
-
-    let info = new google.maps.InfoWindow({
-      content:`<b>${d.nombre}</b><br>Operador: ${d.operador}<br>Aceite: ${d.aceite} bpd<br>Gas: ${d.gas} mmpcd`
-    });
-
-    circle.addListener("click", ()=>{
-      info.setPosition({lat:d.lat, lng:d.lng});
-      info.open(map);
-    });
-
-    circulos.push(circle);
-  });
-}
-</script>
-
-<script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxISuoMjIMNpzds2UN_5L1JjAizg_PBtM&callback=initMap">
-</script>
-
+  <!-- Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxISuoMjIMNpzds2UN_5L1JjAizg_PBtM"></script>
+  <script src="js/mapa.js"></script>
 </body>
 </html>
