@@ -8,9 +8,11 @@ window.initMap = function () {
         center: { lat: 21, lng: -94 }
     });
 
-    cargarCampos();
-    cargarPozos();
-    cargarPuertos();
+  cargarCampos();
+cargarPozos();
+cargarPuertos();
+
+setTimeout(inicializarFiltros, 1000);
 };
 
 
