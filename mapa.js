@@ -1,126 +1,142 @@
 let map;
+let infoWindow;
 let marcadores = [];
-let markersCampos = [];
-let markersPuertos = [];
-let clusterCampos;
+let cluster;
 let bounds;
 
-// ===============================
-// INICIALIZAR MAPA
-// ===============================
+// =====================
+// INICIAR MAPA
+// =====================
 window.initMap = function () {
 
     bounds = new google.maps.LatLngBounds();
 
     map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 6,
-        center: { lat: 21, lng: -94 },
-        mapTypeId: "roadmap"
+        center:{lat:21,lng:-94},
+        zoom:6,
+        mapTypeId:"hybrid"
     });
+
+    infoWindow = new google.maps.InfoWindow();
 
     cargarCampos();
-    cargarPuertos();
 };
 
-// ===============================
+// =====================
+// ICONOS POR OPERADOR
+// =====================
+function obtenerIcono(operador){
+
+    const colores={
+        "Pemex":"red",
+        "ENI":"green",
+        "Fieldwood":"purple",
+        "Woodside":"orange",
+        "Hokchi":"yellow"
+    };
+
+    const color=colores[operador] || "blue";
+
+    return {
+        url:`https://maps.google.com/mapfiles/ms/icons/${color}-dot.png`
+    };
+}
+
+// =====================
 // CARGAR CAMPOS
-// ===============================
-async function cargarCampos() {
+// =====================
+async function cargarCampos(){
 
-    const response = await fetch("campos.json");
-    const data = await response.json();
+    const res=await fetch("campos.json");
+    const campos=await res.json();
 
-    data.forEach(campo => {
+    const markersCluster=[];
 
-        const marker = new google.maps.Marker({
-            position: {
-                lat: campo.lat,
-                lng: campo.lng
-            },
-            title: campo.nombre,
-            icon: {
-                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
-            }
+    campos.forEach(campo=>{
+
+        const marker=new google.maps.Marker({
+            position:{lat:campo.lat,lng:campo.lng},
+            title:campo.nombre,
+            icon:obtenerIcono(campo.operador),
+            map:map
         });
 
-        marker.operador = campo.operador;
-        marker.setMap(map);
+        marker.operador=campo.operador;
+
+        marker.addListener("click",()=>{
+            infoWindow.setContent(`
+                <strong>${campo.nombre}</strong><br>
+                Operador: ${campo.operador}
+            `);
+            infoWindow.open(map,marker);
+        });
 
         marcadores.push(marker);
-        markersCampos.push(marker);
+        markersCluster.push(marker);
 
         bounds.extend(marker.getPosition());
+
+        agregarAlPanel(campo,marker);
     });
 
-    clusterCampos = new markerClusterer.MarkerClusterer({
+    cluster=new markerClusterer.MarkerClusterer({
         map,
-        markers: markersCampos
-    });
-}
-
-// ===============================
-// CARGAR PUERTOS
-// ===============================
-async function cargarPuertos() {
-
-    try {
-        const response = await fetch("puertos.json");
-        const data = await response.json();
-
-        data.forEach(puerto => {
-
-            const marker = new google.maps.Marker({
-                position: {
-                    lat: puerto.lat,
-                    lng: puerto.lng
-                },
-                title: puerto.nombre,
-                icon: {
-                    url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                },
-                map: map
-            });
-
-            markersPuertos.push(marker);
-
-            bounds.extend(marker.getPosition());
-        });
-
-        // 🔥 AUTO ZOOM GENERAL
-        map.fitBounds(bounds);
-
-    } catch (error) {
-        console.warn("No se encontró puertos.json (no es obligatorio)");
-    }
-}
-
-// ===============================
-// FILTRO POR OPERADOR + AUTO ZOOM
-// ===============================
-function filtrarOperador() {
-
-    const operadorSeleccionado =
-        document.getElementById("operador").value;
-
-    const boundsFiltro = new google.maps.LatLngBounds();
-    let visibles = 0;
-
-    markersCampos.forEach(marker => {
-
-        if (
-            operadorSeleccionado === "todos" ||
-            marker.operador === operadorSeleccionado
-        ) {
-            marker.setVisible(true);
-            boundsFiltro.extend(marker.getPosition());
-            visibles++;
-        } else {
-            marker.setVisible(false);
-        }
+        markers:markersCluster
     });
 
-    // 🔥 ZOOM AUTOMÁTICO SOLO SI HAY RESULTADOS
-    if (visibles > 0) {
-        map.fitBounds(boundsFiltro);
-    }
+    map.fitBounds(bounds);
 }
+
+// =====================
+// PANEL LATERAL
+// =====================
+function agregarAlPanel(campo,marker){
+
+    const lista=document.getElementById("listaCampos");
+
+    const item=document.createElement("li");
+    item.textContent=campo.nombre;
+
+    item.addEventListener("click",()=>{
+
+        map.panTo(marker.getPosition());
+        map.setZoom(9);
+
+        infoWindow.setContent(`
+            <strong>${campo.nombre}</strong><br>
+            Operador: ${campo.operador}
+        `);
+
+        infoWindow.open(map,marker);
+    });
+
+    lista.appendChild(item);
+}
+
+// =====================
+// BUSCADOR
+// =====================
+document.addEventListener("input",e=>{
+
+    if(e.target.id!=="buscador") return;
+
+    const texto=e.target.value.toLowerCase();
+
+    document.querySelectorAll("#listaCampos li")
+    .forEach(li=>{
+        li.style.display=
+            li.textContent.toLowerCase().includes(texto)
+            ?"block":"none";
+    });
+});
+
+// =====================
+// PANEL COLAPSABLE
+// =====================
+document.addEventListener("click",e=>{
+
+    if(e.target.id!=="togglePanel") return;
+
+    document.getElementById("panel")
+    .classList.toggle("panel-cerrado");
+});
