@@ -78,5 +78,3 @@ function iconoOperador(op) {
             info.open(map, marker);
         });
     });
-
-};
