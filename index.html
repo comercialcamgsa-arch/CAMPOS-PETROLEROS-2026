@@ -1,29 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mapa Google</title>
-  <meta charset="UTF-8">
-
-  <style>
-    #map {
-      height: 400px;
-      width: 100%;
-    }
-  </style>
+  <title>Mapa</title>
 </head>
-
 <body>
 
-  <h2>Mi mapa</h2>
+  <div id="map" style="height:400px; width:100%;"></div>
 
-  <div id="map"></div>
-
-  <!-- TU SCRIPT (PRIMERO) -->
+  <!-- TU JS -->
   <script src="mapa.js"></script>
 
-  <!-- GOOGLE MAPS (DESPUÉS) -->
+  <!-- GOOGLE MAPS -->
   <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxISuoMjIMNpzds2UN_5L1JjAizg_PBtM&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
   </script>
 
 </body>
