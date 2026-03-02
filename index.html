@@ -22,8 +22,8 @@ body{
     position:absolute;
     top:15px;
     left:15px;
-    width:280px;
-    max-height:85vh;
+    width:300px;
+    max-height:90vh;
     background:white;
     border-radius:12px;
     box-shadow:0 8px 20px rgba(0,0,0,.25);
@@ -34,7 +34,7 @@ body{
 }
 
 .panel-cerrado{
-    transform:translateX(-260px);
+    transform:translateX(-280px);
 }
 
 .panel-header{
@@ -76,6 +76,17 @@ body{
     cursor:pointer;
 }
 
+/* DASHBOARD */
+#dashboard{
+    padding:0 15px 10px 15px;
+    font-size:14px;
+}
+
+#filtros{
+    padding:0 15px 10px 15px;
+    font-size:14px;
+}
+
 </style>
 </head>
 
@@ -88,16 +99,52 @@ body{
         <button id="togglePanel">☰</button>
     </div>
 
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+        <div><strong>Campos visibles:</strong> <span id="totalCampos">0</span></div>
+        <div>🛢 Aceite total: <span id="totalAceite">0</span> bpd</div>
+        <div>🔥 Gas total: <span id="totalGas">0</span> mmpcd</div>
+    </div>
+
+    <!-- BUSCADOR -->
     <input type="text" id="buscador" placeholder="Buscar campo...">
+
+    <!-- FILTROS -->
+    <div id="filtros">
+        <strong>Operadores</strong><br>
+
+        <label>
+            <input type="checkbox" value="Pemex" checked> Pemex
+        </label><br>
+
+        <label>
+            <input type="checkbox" value="ENI" checked> ENI
+        </label><br>
+
+        <label>
+            <input type="checkbox" value="Fieldwood" checked> Fieldwood
+        </label><br>
+
+        <label>
+            <input type="checkbox" value="Woodside" checked> Woodside
+        </label><br>
+
+        <label>
+            <input type="checkbox" value="Hokchi" checked> Hokchi
+        </label>
+    </div>
+
+    <!-- LISTA -->
     <ul id="listaCampos"></ul>
 </div>
 
+<!-- MAPA -->
 <div id="map"></div>
 
 <!-- LIBRERÍA CLUSTER -->
 <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 
-<!-- TU MAPA -->
+<!-- TU JS -->
 <script src="mapa.js"></script>
 
 <!-- GOOGLE MAPS -->
