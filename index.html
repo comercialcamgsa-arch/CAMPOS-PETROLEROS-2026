@@ -1,67 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Campos Petroleros 2026</title>
+<meta charset="UTF-8">
+<title>Mapa Petrolero Golfo de México</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+<style>
 
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+}
 
-        /* Panel de filtros */
-        #panel {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            z-index: 5;
-        }
+/* MAPA */
+#map{
+    height:100vh;
+    width:100%;
+}
 
-        #panel h3 {
-            margin-top: 0;
-        }
+/* PANEL */
+#panel{
+    position:absolute;
+    top:15px;
+    left:15px;
+    width:280px;
+    max-height:85vh;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+    transition:.3s;
+}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-    </style>
+.panel-cerrado{
+    transform:translateX(-260px);
+}
+
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+}
+
+#buscador{
+    margin:0 15px 10px 15px;
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #ddd;
+}
+
+#listaCampos{
+    list-style:none;
+    padding:0;
+    margin:0;
+    overflow-y:auto;
+}
+
+#listaCampos li{
+    padding:10px 15px;
+    cursor:pointer;
+    border-bottom:1px solid #eee;
+}
+
+#listaCampos li:hover{
+    background:#f3f3f3;
+}
+
+#togglePanel{
+    border:none;
+    background:#eee;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+</style>
 </head>
 
 <body>
 
-<!-- PANEL DE FILTROS -->
+<!-- PANEL -->
 <div id="panel">
-    <h3>Operadores</h3>
+    <div class="panel-header">
+        <h3>Campos Petroleros</h3>
+        <button id="togglePanel">☰</button>
+    </div>
 
-    <label><input type="checkbox" value="Pemex" checked onchange="filtrarOperadores()"> Pemex</label>
-    <label><input type="checkbox" value="ENI" checked onchange="filtrarOperadores()"> ENI</label>
-    <label><input type="checkbox" value="Fieldwood" checked onchange="filtrarOperadores()"> Fieldwood</label>
-    <label><input type="checkbox" value="Woodside" checked onchange="filtrarOperadores()"> Woodside</label>
-    <label><input type="checkbox" value="Hokchi" checked onchange="filtrarOperadores()"> Hokchi</label>
+    <input type="text" id="buscador" placeholder="Buscar campo...">
+    <ul id="listaCampos"></ul>
 </div>
 
-<!-- MAPA -->
 <div id="map"></div>
 
-<!-- DATOS -->
-<script src="puertos.js"></script>
+<!-- LIBRERÍA CLUSTER -->
+<script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+
+<!-- TU MAPA -->
 <script src="mapa.js"></script>
 
-    <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
-<!-- GOOGLE MAPS (SIEMPRE AL FINAL) -->
+<!-- GOOGLE MAPS -->
 <script async
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLICgFgsKNMT1N6yl94Jb_K1B0Qdg4-x8&callback=initMap">
+src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
 </script>
 
 </body>
