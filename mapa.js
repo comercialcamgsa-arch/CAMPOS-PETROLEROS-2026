@@ -9,8 +9,13 @@ window.initMap = function () {
     });
 
     cargarCampos();
+    cargarPuertos(); // 👈 ahora los puertos se cargan correctamente
 };
 
+
+// =========================
+// CARGAR CAMPOS / POZOS
+// =========================
 async function cargarCampos() {
 
     const respuesta = await fetch("campos.json");
@@ -38,26 +43,13 @@ async function cargarCampos() {
         marker.addListener("click", () => info.open(map, marker));
     });
 }
-function iconoOperador(op) {
 
-    if (op.includes("Pemex"))
-        return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
 
-    if (op.includes("ENI"))
-        return "http://maps.google.com/mapfiles/ms/icons/orange-dot.png";
+// =========================
+// CARGAR PUERTOS
+// =========================
+function cargarPuertos() {
 
-    if (op.includes("Fieldwood"))
-        return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-
-    if (op.includes("Woodside"))
-        return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-
-    if (op.includes("Hokchi"))
-        return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
-
-    return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
-}
-    // ===== PUERTOS =====
     puertos.forEach(puerto => {
 
         const marker = new google.maps.Marker({
@@ -78,3 +70,28 @@ function iconoOperador(op) {
             info.open(map, marker);
         });
     });
+}
+
+
+// =========================
+// ICONOS POR OPERADOR
+// =========================
+function iconoOperador(op) {
+
+    if (op.includes("Pemex"))
+        return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+
+    if (op.includes("ENI"))
+        return "http://maps.google.com/mapfiles/ms/icons/orange-dot.png";
+
+    if (op.includes("Fieldwood"))
+        return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+
+    if (op.includes("Woodside"))
+        return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+
+    if (op.includes("Hokchi"))
+        return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
+
+    return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+}
