@@ -1,0 +1,62 @@
+[
+  {
+    "nombre": "Ku-Maloob-Zaap",
+    "operador": "Pemex",
+    "lat": 20.6,
+    "lng": -92.3
+  },
+  {
+    "nombre": "Cantarell",
+    "operador": "Pemex",
+    "lat": 19.4,
+    "lng": -92.2
+  },
+  {
+    "nombre": "Zaap",
+    "operador": "Pemex",
+    "lat": 20.5,
+    "lng": -92.4
+  },
+  {
+    "nombre": "Amoca",
+    "operador": "ENI",
+    "lat": 18.5,
+    "lng": -93.5
+  },
+  {
+    "nombre": "Miztón",
+    "operador": "ENI",
+    "lat": 18.55,
+    "lng": -93.6
+  },
+  {
+    "nombre": "Hokchi",
+    "operador": "Hokchi",
+    "lat": 19.0,
+    "lng": -92.3
+  },
+  {
+    "nombre": "Ichalkil",
+    "operador": "Fieldwood",
+    "lat": 19.2,
+    "lng": -92.1
+  },
+  {
+    "nombre": "Pokoch",
+    "operador": "Fieldwood",
+    "lat": 19.3,
+    "lng": -92.0
+  },
+  {
+    "nombre": "Zama",
+    "operador": "Woodside",
+    "lat": 19.1,
+    "lng": -93.2
+  },
+  {
+    "nombre": "Chalabil",
+    "operador": "Murphy",
+    "lat": 22.1,
+    "lng": -96.5
+  }
+]
