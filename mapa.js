@@ -63,11 +63,15 @@ async function cargarCampos() {
 
         marker.operador = campo.operador;
         marker.nombre = campo.nombre;
+        marker.aceite = campo.aceite_bpd || 0;
+        marker.gas = campo.gas_mmpcd || 0;
 
         marker.addListener("click", () => {
             infoWindow.setContent(`
                 <strong>${campo.nombre}</strong><br>
-                Operador: ${campo.operador}
+                Operador: ${campo.operador}<br>
+                🛢 Aceite: ${marker.aceite.toLocaleString()} bpd<br>
+                🔥 Gas: ${marker.gas.toLocaleString()} mmpcd
             `);
             infoWindow.open(map, marker);
         });
@@ -75,7 +79,6 @@ async function cargarCampos() {
         marcadores.push(marker);
         markersCluster.push(marker);
         bounds.extend(marker.getPosition());
-
     });
 
     cluster = new markerClusterer.MarkerClusterer({
@@ -85,42 +88,7 @@ async function cargarCampos() {
 
     map.fitBounds(bounds);
 
-    actualizarPanel();
-}
-
-// =====================
-// ACTUALIZAR PANEL SEGÚN FILTROS
-// =====================
-function actualizarPanel() {
-
-    const lista = document.getElementById("listaCampos");
-    lista.innerHTML = "";
-
-    const operadoresActivos = obtenerOperadoresActivos();
-
-    marcadores.forEach(marker => {
-
-        if (operadoresActivos.includes(marker.operador) && marker.getVisible()) {
-
-            const item = document.createElement("li");
-            item.textContent = marker.nombre;
-
-            item.addEventListener("click", () => {
-                map.panTo(marker.getPosition());
-                map.setZoom(9);
-
-                infoWindow.setContent(`
-                    <strong>${marker.nombre}</strong><br>
-                    Operador: ${marker.operador}
-                `);
-
-                infoWindow.open(map, marker);
-            });
-
-            lista.appendChild(item);
-        }
-
-    });
+    actualizarTodo();
 }
 
 // =====================
@@ -139,20 +107,53 @@ function obtenerOperadoresActivos() {
 }
 
 // =====================
-// FILTROS
+// ACTUALIZAR PANEL + DASHBOARD
 // =====================
-function aplicarFiltros() {
+function actualizarTodo() {
+
+    const lista = document.getElementById("listaCampos");
+    lista.innerHTML = "";
 
     const operadoresActivos = obtenerOperadoresActivos();
+
+    let totalCampos = 0;
+    let totalAceite = 0;
+    let totalGas = 0;
+
     const nuevosMarkers = [];
     const nuevosBounds = new google.maps.LatLngBounds();
 
     marcadores.forEach(marker => {
 
         if (operadoresActivos.includes(marker.operador)) {
+
             marker.setVisible(true);
             nuevosMarkers.push(marker);
             nuevosBounds.extend(marker.getPosition());
+
+            totalCampos++;
+            totalAceite += marker.aceite;
+            totalGas += marker.gas;
+
+            const item = document.createElement("li");
+            item.textContent = marker.nombre;
+
+            item.addEventListener("click", () => {
+                map.panTo(marker.getPosition());
+                map.setZoom(9);
+
+                infoWindow.setContent(`
+                    <strong>${marker.nombre}</strong><br>
+                    Operador: ${marker.operador}<br>
+                    🛢 Aceite: ${marker.aceite.toLocaleString()} bpd<br>
+                    🔥 Gas: ${marker.gas.toLocaleString()} mmpcd
+                `);
+
+                infoWindow.open(map, marker);
+            });
+
+            lista.appendChild(item);
+
         } else {
             marker.setVisible(false);
         }
@@ -166,13 +167,18 @@ function aplicarFiltros() {
         map.fitBounds(nuevosBounds);
     }
 
-    actualizarPanel();
+    // ACTUALIZAR DASHBOARD
+    document.getElementById("totalCampos").textContent = totalCampos;
+    document.getElementById("totalAceite").textContent = totalAceite.toLocaleString();
+    document.getElementById("totalGas").textContent = totalGas.toLocaleString();
 }
 
-// Detectar cambios en filtros
+// =====================
+// FILTROS
+// =====================
 document.addEventListener("change", function (e) {
     if (e.target.closest("#filtros")) {
-        aplicarFiltros();
+        actualizarTodo();
     }
 });
 
