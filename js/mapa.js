@@ -1,48 +1,14 @@
+function initMap() {
 
+  const ubicacion = { lat: 17.9892, lng: -92.9475 };
 
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Mapa Pozos Golfo de México</title>
+  const mapa = new google.maps.Map(document.getElementById("map"), {
+    zoom: 14,
+    center: ubicacion,
+  });
 
-  <style>
-    body { margin: 0; font-family: Arial; }
-    #map { height: 90vh; width: 100%; }
-    #controls {
-      background: white;
-      padding: 10px;
-    }
-    .checkbox-item { margin-bottom: 5px; }
-  </style>
-</head>
-
-<body>
-
-<div id="controls">
-  <h3>Filtros</h3>
-
-  <div class="checkbox-item">
-    <input type="checkbox" class="filter" value="Pemex" checked> Pemex
-  </div>
-
-  <div class="checkbox-item">
-    <input type="checkbox" class="filter" value="Woodside" checked> Woodside
-  </div>
-
-  <div class="checkbox-item">
-    <input type="checkbox" class="filter" value="Fieldwood" checked> Fieldwood
-  </div>
-
-  <div class="checkbox-item">
-    <input type="checkbox" class="filter" value="Puertos" checked> Puertos
-  </div>
-</div>
-
-<div id="map"></div>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY_AQUI&callback=initMap" async defer></script>
-<script src="js/mapa.js"></script>
-
-</body>
-</html>
+  new google.maps.Marker({
+    position: ubicacion,
+    map: mapa,
+  });
+}
