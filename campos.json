@@ -59,28 +59,4 @@
     "lat": 22.1,
     "lng": -96.5
   }
-]
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "nombre": "Ku-Maloob-Zaap",
-        "operador": "Pemex",
-        "aceite_bpd": 670000,
-        "gas_mmpcd": 850
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-          [-93.65,22.45],
-          [-93.55,22.45],
-          [-93.55,22.38],
-          [-93.65,22.38],
-          [-93.65,22.45]
-        ]]
-      }
-    }
-  ]
-}
+
