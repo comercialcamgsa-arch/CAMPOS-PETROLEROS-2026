@@ -1,211 +1,117 @@
 let map;
 let infoWindow;
-let marcadores = [];
-let cluster;
-let bounds;
+let operadorActivo = "";
 
-// =====================
-// INICIAR MAPA
-// =====================
-window.initMap = function () {
-
-    bounds = new google.maps.LatLngBounds();
+window.initMap = function(){
 
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 21, lng: -94 },
         zoom: 6,
-        mapTypeId: "hybrid"
+        mapTypeId: "roadmap"
     });
 
     infoWindow = new google.maps.InfoWindow();
 
-    cargarCampos();
+    cargarDatos();
 };
 
-// =====================
-// ICONOS POR OPERADOR
-// =====================
-function obtenerIcono(operador) {
+function colorOperador(operador){
 
-    const colores = {
-        "Pemex": "red",
-        "ENI": "green",
-        "Fieldwood": "purple",
-        "Woodside": "orange",
-        "Hokchi": "yellow"
+    const colores={
+        "Pemex":"#d32f2f",
+        "ENI":"#2e7d32",
+        "Fieldwood":"#6a1b9a",
+        "Woodside":"#ef6c00",
+        "Hokchi":"#f9a825"
     };
 
-    const color = colores[operador] || "blue";
+    return colores[operador] || "#1565c0";
+}
+
+async function cargarDatos(){
+
+    const res = await fetch("campos.geojson");
+    const geojson = await res.json();
+
+    map.data.addGeoJson(geojson);
+
+    map.data.setStyle(estiloPoligono);
+
+    map.data.addListener("mouseover", mostrarInfo);
+    map.data.addListener("mouseout", () => infoWindow.close());
+
+    actualizarVista();
+}
+
+function estiloPoligono(feature){
+
+    const operador = feature.getProperty("operador");
+
+    if(operadorActivo && operador !== operadorActivo){
+        return { visible:false };
+    }
 
     return {
-        url: `https://maps.google.com/mapfiles/ms/icons/${color}-dot.png`
+        fillColor: colorOperador(operador),
+        strokeColor: "#333",
+        strokeWeight: 1,
+        fillOpacity: 0.6
     };
 }
 
-// =====================
-// CARGAR CAMPOS
-// =====================
-async function cargarCampos() {
+function mostrarInfo(event){
 
-    const res = await fetch("campos.json");
-    const campos = await res.json();
+    const nombre = event.feature.getProperty("nombre");
+    const operador = event.feature.getProperty("operador");
+    const aceite = event.feature.getProperty("aceite_bpd");
+    const gas = event.feature.getProperty("gas_mmpcd");
 
-    const markersCluster = [];
+    infoWindow.setContent(`
+        <strong>${nombre}</strong><br>
+        Operador: ${operador}<br>
+        Aceite: ${aceite.toLocaleString()} bpd<br>
+        Gas: ${gas.toLocaleString()} mmpcd
+    `);
 
-    campos.forEach(campo => {
-
-        const marker = new google.maps.Marker({
-            position: { lat: campo.lat, lng: campo.lng },
-            title: campo.nombre,
-            icon: obtenerIcono(campo.operador),
-            map: map
-        });
-
-        marker.operador = campo.operador;
-        marker.nombre = campo.nombre;
-        marker.aceite = campo.aceite_bpd || 0;
-        marker.gas = campo.gas_mmpcd || 0;
-
-        marker.addListener("click", () => {
-            infoWindow.setContent(`
-                <strong>${campo.nombre}</strong><br>
-                Operador: ${campo.operador}<br>
-                🛢 Aceite: ${marker.aceite.toLocaleString()} bpd<br>
-                🔥 Gas: ${marker.gas.toLocaleString()} mmpcd
-            `);
-            infoWindow.open(map, marker);
-        });
-
-        marcadores.push(marker);
-        markersCluster.push(marker);
-        bounds.extend(marker.getPosition());
-    });
-
-    cluster = new markerClusterer.MarkerClusterer({
-        map,
-        markers: markersCluster
-    });
-
-    map.fitBounds(bounds);
-
-    actualizarTodo();
+    infoWindow.setPosition(event.latLng);
+    infoWindow.open(map);
 }
 
-// =====================
-// OBTENER OPERADORES ACTIVOS
-// =====================
-function obtenerOperadoresActivos() {
-
-    const checkboxes = document.querySelectorAll('#filtros input[type="checkbox"]');
-    const activos = [];
-
-    checkboxes.forEach(cb => {
-        if (cb.checked) activos.push(cb.value);
-    });
-
-    return activos;
-}
-
-// =====================
-// ACTUALIZAR PANEL + DASHBOARD
-// =====================
-function actualizarTodo() {
-
-    const lista = document.getElementById("listaCampos");
-    lista.innerHTML = "";
-
-    const operadoresActivos = obtenerOperadoresActivos();
+function actualizarVista(){
 
     let totalCampos = 0;
     let totalAceite = 0;
     let totalGas = 0;
 
-    const nuevosMarkers = [];
-    const nuevosBounds = new google.maps.LatLngBounds();
+    const lista = document.getElementById("listaCampos");
+    lista.innerHTML = "";
 
-    marcadores.forEach(marker => {
+    map.data.forEach(feature => {
 
-        if (operadoresActivos.includes(marker.operador)) {
+        const operador = feature.getProperty("operador");
 
-            marker.setVisible(true);
-            nuevosMarkers.push(marker);
-            nuevosBounds.extend(marker.getPosition());
+        if(!operadorActivo || operador === operadorActivo){
 
             totalCampos++;
-            totalAceite += marker.aceite;
-            totalGas += marker.gas;
+            totalAceite += feature.getProperty("aceite_bpd");
+            totalGas += feature.getProperty("gas_mmpcd");
 
-            const item = document.createElement("li");
-            item.textContent = marker.nombre;
-
-            item.addEventListener("click", () => {
-                map.panTo(marker.getPosition());
-                map.setZoom(9);
-
-                infoWindow.setContent(`
-                    <strong>${marker.nombre}</strong><br>
-                    Operador: ${marker.operador}<br>
-                    🛢 Aceite: ${marker.aceite.toLocaleString()} bpd<br>
-                    🔥 Gas: ${marker.gas.toLocaleString()} mmpcd
-                `);
-
-                infoWindow.open(map, marker);
-            });
-
-            lista.appendChild(item);
-
-        } else {
-            marker.setVisible(false);
+            const li = document.createElement("li");
+            li.textContent = feature.getProperty("nombre");
+            lista.appendChild(li);
         }
-
     });
 
-    cluster.clearMarkers();
-    cluster.addMarkers(nuevosMarkers);
+    document.getElementById("kpiCampos").textContent = totalCampos;
+    document.getElementById("kpiAceite").textContent = totalAceite.toLocaleString();
+    document.getElementById("kpiGas").textContent = totalGas.toLocaleString();
 
-    if (nuevosMarkers.length > 0) {
-        map.fitBounds(nuevosBounds);
-    }
-
-    // ACTUALIZAR DASHBOARD
-    document.getElementById("totalCampos").textContent = totalCampos;
-    document.getElementById("totalAceite").textContent = totalAceite.toLocaleString();
-    document.getElementById("totalGas").textContent = totalGas.toLocaleString();
+    map.data.setStyle(estiloPoligono);
 }
 
-// =====================
-// FILTROS
-// =====================
-document.addEventListener("change", function (e) {
-    if (e.target.closest("#filtros")) {
-        actualizarTodo();
-    }
-});
+document.getElementById("operadorSelect")
+.addEventListener("change", function(){
 
-// =====================
-// BUSCADOR
-// =====================
-document.addEventListener("input", e => {
-
-    if (e.target.id !== "buscador") return;
-
-    const texto = e.target.value.toLowerCase();
-
-    document.querySelectorAll("#listaCampos li")
-        .forEach(li => {
-            li.style.display =
-                li.textContent.toLowerCase().includes(texto)
-                    ? "block" : "none";
-        });
-});
-
-// =====================
-// PANEL COLAPSABLE
-// =====================
-document.addEventListener("click", e => {
-
-    if (e.target.id !== "togglePanel") return;
-
-    document.getElementById("panel")
-        .classList.toggle("panel-cerrado");
+    operadorActivo = this.value;
+    actualizarVista();
 });
