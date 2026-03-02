@@ -74,7 +74,9 @@ async function cargarPuertos() {
 
         puertos.forEach(puerto => {
 
-            const marker = new google.maps.Marker({
+           marker.addListener("click", () => {
+    info.open(map, marker);
+));
                 position: {
                     lat: Number(puerto.lat),
                     lng: Number(puerto.lng)
