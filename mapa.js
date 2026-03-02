@@ -1,35 +1,43 @@
 let map;
+let marcadores = [];
 
-// FUNCION GLOBAL (OBLIGATORIA)
 window.initMap = function () {
 
-    // Centro del Golfo de México
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 6,
-        center: { lat: 21.0, lng: -94.0 }
+        center: { lat: 21, lng: -94 }
     });
 
-    // ===== CAMPOS PETROLEROS =====
+    cargarCampos();
+};
+
+async function cargarCampos() {
+
+    const respuesta = await fetch("campos.json");
+    const campos = await respuesta.json();
+
     campos.forEach(campo => {
 
         const marker = new google.maps.Marker({
             position: { lat: campo.lat, lng: campo.lng },
             map: map,
             title: campo.nombre,
-            icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+            icon: iconoOperador(campo.operador)
         });
+
+        marker.operador = campo.operador;
+        marcadores.push(marker);
 
         const info = new google.maps.InfoWindow({
             content: `
                 <h3>${campo.nombre}</h3>
-                <p><b>Operador:</b> ${campo.operador}</p>
+                <b>Operador:</b> ${campo.operador}
             `
         });
 
-        marker.addListener("click", () => {
-            info.open(map, marker);
-        });
+        marker.addListener("click", () => info.open(map, marker));
     });
+}
 
     // ===== PUERTOS =====
     puertos.forEach(puerto => {
