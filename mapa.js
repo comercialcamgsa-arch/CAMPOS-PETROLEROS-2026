@@ -1,108 +1,112 @@
+// =============================
+// VARIABLES GLOBALES
+// =============================
 let map;
 let marcadores = [];
 
+// =============================
+// INICIALIZAR MAPA
+// =============================
 window.initMap = function () {
 
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 6,
-        center: { lat: 21, lng: -94 }
+        center: { lat: 21, lng: -94 },
+        mapTypeId: "roadmap"
     });
 
-  cargarCampos();
-cargarPozos();
-cargarPuertos();
-
-setTimeout(inicializarFiltros, 1000);
+    cargarCampos();
+    cargarPuertos();
 };
-function inicializarFiltros(){
 
-    const checks = document.querySelectorAll("#panel-filtros input");
-
-    checks.forEach(c => {
-        c.addEventListener("change", aplicarFiltros);
-    });
-}
-
-// ================= CAMPOS =================
+// =============================
+// CARGAR CAMPOS PETROLEROS
+// =============================
 async function cargarCampos() {
 
-    const res = await fetch("campos.json");
-    const campos = await res.json();
+    try {
 
-    crearMarcadores(campos, "Campo");
-}
+        const respuesta = await fetch("campos.json");
+        const campos = await respuesta.json();
 
+        campos.forEach(campo => {
 
-// ================= POZOS =================
-async function cargarPozos() {
+            const marker = new google.maps.Marker({
+                position: {
+                    lat: Number(campo.lat),
+                    lng: Number(campo.lng)
+                },
+                map: map,
+                title: campo.nombre,
+                icon: iconoOperador(campo.operador)
+            });
 
-    const res = await fetch("pozos.json");
-    const pozos = await res.json();
+            // guardar operador para futuros filtros
+            marker.operador = campo.operador;
+            marcadores.push(marker);
 
-    crearMarcadores(pozos, "Pozo");
-}
-marker.operador = item.operador;
+            const info = new google.maps.InfoWindow({
+                content: `
+                    <h3>${campo.nombre}</h3>
+                    <b>Operador:</b> ${campo.operador}
+                `
+            });
 
-// ================= CREAR MARCADORES =================
-function crearMarcadores(datos, tipo) {
-
-    datos.forEach(item => {
-
-        const marker = new google.maps.Marker({
-    position: { lat: item.lat, lng: item.lng },
-    map: map,
-    title: item.nombre,
-    icon: iconoOperador(item.operador)
-});
-
-marker.operador = item.operador; // 👈 IMPORTANTE
+            marker.addListener("click", () => {
+                info.open(map, marker);
+            });
         });
 
-        marcadores.push(marker);
-
-        const info = new google.maps.InfoWindow({
-            content: `
-                <h3>${item.nombre}</h3>
-                <b>Tipo:</b> ${tipo}<br>
-                <b>Operador:</b> ${item.operador}
-            `
-        });
-
-        marker.addListener("click", () =>
-            info.open(map, marker)
-        );
-    });
+    } catch (error) {
+        console.error("Error cargando campos:", error);
+    }
 }
 
+// =============================
+// CARGAR PUERTOS
+// =============================
+async function cargarPuertos() {
 
-// ================= PUERTOS =================
-function cargarPuertos() {
+    try {
 
-    puertos.forEach(puerto => {
+        const respuesta = await fetch("puertos.json");
+        const puertos = await respuesta.json();
 
-        const marker = new google.maps.Marker({
-            position: { lat: puerto.lat, lng: puerto.lng },
-            map: map,
-            title: puerto.nombre,
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        puertos.forEach(puerto => {
+
+            const marker = new google.maps.Marker({
+                position: {
+                    lat: Number(puerto.lat),
+                    lng: Number(puerto.lng)
+                },
+                map: map,
+                title: puerto.nombre,
+                icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+            });
+
+            const info = new google.maps.InfoWindow({
+                content: `
+                    <h3>${puerto.nombre}</h3>
+                    <p><b>Operadores:</b> ${puerto.operadores}</p>
+                `
+            });
+
+            marker.addListener("click", () => {
+                info.open(map, marker);
+            });
         });
 
-        const info = new google.maps.InfoWindow({
-            content: `
-                <h3>${puerto.nombre}</h3>
-                <b>Operadores:</b> ${puerto.operadores}
-            `
-        });
-
-        marker.addListener("click", () =>
-            info.open(map, marker)
-        );
-    });
+    } catch (error) {
+        console.error("Error cargando puertos:", error);
+    }
 }
 
-
-// ================= ICONOS =================
+// =============================
+// ICONOS SEGÚN OPERADOR
+// =============================
 function iconoOperador(op) {
+
+    if (!op) return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
 
     if (op.includes("Pemex"))
         return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
@@ -120,23 +124,4 @@ function iconoOperador(op) {
         return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
 
     return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
-}
-function aplicarFiltros() {
-
-    const checks = document.querySelectorAll("#panel-filtros input");
-
-    const activos = [];
-
-    checks.forEach(c => {
-        if (c.checked) activos.push(c.value);
-    });
-
-    marcadores.forEach(marker => {
-
-        const visible = activos.some(op =>
-            marker.operador.includes(op)
-        );
-
-        marker.setVisible(visible);
-    });
 }
