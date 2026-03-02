@@ -14,7 +14,14 @@ cargarPuertos();
 
 setTimeout(inicializarFiltros, 1000);
 };
+function inicializarFiltros(){
 
+    const checks = document.querySelectorAll("#panel-filtros input");
+
+    checks.forEach(c => {
+        c.addEventListener("change", aplicarFiltros);
+    });
+}
 
 // ================= CAMPOS =================
 async function cargarCampos() {
