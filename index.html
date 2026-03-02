@@ -2,50 +2,74 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Mapa Petrolero Golfo de México</title>
+<title>Sistema Interno - Campos Petroleros</title>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial, sans-serif;
+    background:#f4f6f9;
+}
+
+/* KPI BAR */
+#kpiBar{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:90px;
+  background:white;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  z-index:1000;
+}
+
+.kpi h4{
+  margin:0;
+  font-size:14px;
+  color:#666;
+}
+
+.kpi span{
+  font-size:22px;
+  font-weight:bold;
+  color:#1f2937;
 }
 
 /* MAPA */
 #map{
-    height:100vh;
-    width:100%;
+    position:absolute;
+    top:90px;
+    left:0;
+    right:0;
+    bottom:0;
 }
 
 /* PANEL */
 #panel{
     position:absolute;
-    top:15px;
+    top:110px;
     left:15px;
-    width:300px;
-    max-height:90vh;
+    width:280px;
+    max-height:70vh;
     background:white;
     border-radius:12px;
-    box-shadow:0 8px 20px rgba(0,0,0,.25);
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
     z-index:999;
     display:flex;
     flex-direction:column;
-    transition:.3s;
-}
-
-.panel-cerrado{
-    transform:translateX(-280px);
 }
 
 .panel-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
     padding:15px;
+    font-weight:bold;
+    border-bottom:1px solid #eee;
 }
 
-#buscador{
-    margin:0 15px 10px 15px;
+#operadorSelect{
+    margin:10px 15px;
     padding:8px;
     border-radius:6px;
     border:1px solid #ddd;
@@ -67,87 +91,47 @@ body{
 #listaCampos li:hover{
     background:#f3f3f3;
 }
-
-#togglePanel{
-    border:none;
-    background:#eee;
-    padding:6px 10px;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-/* DASHBOARD */
-#dashboard{
-    padding:0 15px 10px 15px;
-    font-size:14px;
-}
-
-#filtros{
-    padding:0 15px 10px 15px;
-    font-size:14px;
-}
-
 </style>
 </head>
 
 <body>
 
+<!-- KPI BAR -->
+<div id="kpiBar">
+  <div class="kpi">
+    <h4>Campos</h4>
+    <span id="kpiCampos">0</span>
+  </div>
+  <div class="kpi">
+    <h4>Aceite Total</h4>
+    <span id="kpiAceite">0</span> bpd
+  </div>
+  <div class="kpi">
+    <h4>Gas Total</h4>
+    <span id="kpiGas">0</span> mmpcd
+  </div>
+</div>
+
 <!-- PANEL -->
 <div id="panel">
-    <div class="panel-header">
-        <h3>Campos Petroleros</h3>
-        <button id="togglePanel">☰</button>
-    </div>
+    <div class="panel-header">Operadores</div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard">
-        <div><strong>Campos visibles:</strong> <span id="totalCampos">0</span></div>
-        <div>🛢 Aceite total: <span id="totalAceite">0</span> bpd</div>
-        <div>🔥 Gas total: <span id="totalGas">0</span> mmpcd</div>
-    </div>
+    <select id="operadorSelect">
+        <option value="">Todos</option>
+        <option value="Pemex">Pemex</option>
+        <option value="ENI">ENI</option>
+        <option value="Fieldwood">Fieldwood</option>
+        <option value="Woodside">Woodside</option>
+        <option value="Hokchi">Hokchi</option>
+    </select>
 
-    <!-- BUSCADOR -->
-    <input type="text" id="buscador" placeholder="Buscar campo...">
-
-    <!-- FILTROS -->
-    <div id="filtros">
-        <strong>Operadores</strong><br>
-
-        <label>
-            <input type="checkbox" value="Pemex" checked> Pemex
-        </label><br>
-
-        <label>
-            <input type="checkbox" value="ENI" checked> ENI
-        </label><br>
-
-        <label>
-            <input type="checkbox" value="Fieldwood" checked> Fieldwood
-        </label><br>
-
-        <label>
-            <input type="checkbox" value="Woodside" checked> Woodside
-        </label><br>
-
-        <label>
-            <input type="checkbox" value="Hokchi" checked> Hokchi
-        </label>
-    </div>
-
-    <!-- LISTA -->
     <ul id="listaCampos"></ul>
 </div>
 
-<!-- MAPA -->
 <div id="map"></div>
 
-<!-- LIBRERÍA CLUSTER -->
-<script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
-
-<!-- TU JS -->
 <script src="mapa.js"></script>
 
-<!-- GOOGLE MAPS -->
 <script async
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLICgFgsKNMT1N6yl94Jb_K1B0Qdg4-x8&callback=initMap">
 </script>
