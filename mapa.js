@@ -8,27 +8,46 @@ window.initMap = function () {
         center: { lat: 21, lng: -94 }
     });
 
-    cargarCampos();
-    cargarPuertos(); // 👈 ahora los puertos se cargan correctamente
+cargarCampos();
+cargarPozos();
+cargarPuertos();
 };
 
 
 // =========================
 // CARGAR CAMPOS / POZOS
 // =========================
-async function cargarCampos() {
+async function cargarPozos() {
 
-    const respuesta = await fetch("campos.json");
-    const campos = await respuesta.json();
+    const respuesta = await fetch("pozos.json");
+    const pozos = await respuesta.json();
 
-    campos.forEach(campo => {
+    pozos.forEach(pozo => {
 
         const marker = new google.maps.Marker({
-            position: { lat: campo.lat, lng: campo.lng },
+            position: { lat: pozo.lat, lng: pozo.lng },
             map: map,
-            title: campo.nombre,
-            icon: iconoOperador(campo.operador)
+            title: pozo.nombre,
+            icon: iconoOperador(pozo.operador),
+            scale: 0.7
         });
+
+        marker.operador = pozo.operador;
+        marcadores.push(marker);
+
+        const info = new google.maps.InfoWindow({
+            content: `
+                <h3>${pozo.nombre}</h3>
+                <b>Tipo:</b> Pozo<br>
+                <b>Operador:</b> ${pozo.operador}
+            `
+        });
+
+        marker.addListener("click", () =>
+            info.open(map, marker)
+        );
+    });
+}
 
         marker.operador = campo.operador;
         marcadores.push(marker);
