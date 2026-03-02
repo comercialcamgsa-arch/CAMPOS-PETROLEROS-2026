@@ -76,7 +76,7 @@ async function cargarPuertos() {
 
            marker.addListener("click", () => {
     info.open(map, marker);
-);
+});
                 position: {
                     lat: Number(puerto.lat),
                     lng: Number(puerto.lng)
