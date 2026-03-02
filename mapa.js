@@ -1,11 +1,19 @@
+// =============================
+// VARIABLES GLOBALES
+// =============================
 let map;
 let marcadores = [];
+let clusterCampos;
 
+// =============================
+// INICIALIZAR MAPA
+// =============================
 window.initMap = function () {
 
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 6,
-        center: { lat: 21, lng: -94 }
+        center: { lat: 21, lng: -94 },
+        mapTypeId: "roadmap"
     });
 
     cargarCampos();
@@ -20,11 +28,12 @@ async function cargarCampos() {
     const respuesta = await fetch("campos.json");
     const campos = await respuesta.json();
 
+    const markersCampos = [];
+
     campos.forEach(campo => {
 
         const marker = new google.maps.Marker({
             position: { lat: campo.lat, lng: campo.lng },
-            map: map,
             title: campo.nombre,
             icon: iconoOperador(campo.operador)
         });
@@ -39,9 +48,18 @@ async function cargarCampos() {
             `
         });
 
-        marker.addListener("click", () => info.open(map, marker));
+        marker.addListener("click", () => {
+            info.open(map, marker);
+        });
 
         marcadores.push(marker);
+        markersCampos.push(marker);
+    });
+
+    // ===== CLUSTER AUTOMÁTICO =====
+    clusterCampos = new markerClusterer.MarkerClusterer({
+        map,
+        markers: markersCampos
     });
 }
 
@@ -68,7 +86,9 @@ function cargarPuertos() {
             `
         });
 
-        marker.addListener("click", () => info.open(map, marker));
+        marker.addListener("click", () => {
+            info.open(map, marker);
+        });
 
         marcadores.push(marker);
     });
@@ -83,9 +103,11 @@ function filtrarOperadores() {
         document.querySelectorAll("#panel input:checked")
     ).map(el => el.value);
 
+    const visibles = [];
+
     marcadores.forEach(marker => {
 
-        // puertos siempre visibles
+        // PUERTOS SIEMPRE VISIBLES
         if (marker.tipo === "puerto") {
             marker.setMap(map);
             return;
@@ -96,7 +118,17 @@ function filtrarOperadores() {
         );
 
         marker.setMap(visible ? map : null);
+
+        if (visible && marker.tipo === "campo") {
+            visibles.push(marker);
+        }
     });
+
+    // reconstruir cluster
+    if (clusterCampos) {
+        clusterCampos.clearMarkers();
+        clusterCampos.addMarkers(visibles);
+    }
 }
 
 // =============================
@@ -118,6 +150,9 @@ function iconoOperador(op) {
 
     if (op.includes("Hokchi"))
         return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
+
+    if (op.includes("Murphy"))
+        return "http://maps.google.com/mapfiles/ms/icons/pink-dot.png";
 
     return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
 }
