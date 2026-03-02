@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Convertir datos CNH → JSON mapa</h2>
+
+<input type="file" id="file">
+
+<script>
+document.getElementById("file").addEventListener("change", function(e){
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+
+        const texto = event.target.result;
+        const lineas = texto.split("\n");
+
+        const pozos = [];
+
+        for(let i=1;i<lineas.length;i++){
+
+            const cols = lineas[i].split(",");
+
+            if(cols.length < 6) continue;
+
+            pozos.push({
+                nombre: cols[0],
+                operador: cols[1],
+                lat: parseFloat(cols[2]),
+                lng: parseFloat(cols[3])
+            });
+        }
+
+        const blob = new Blob(
+            [JSON.stringify(pozos,null,2)],
+            {type:"application/json"}
+        );
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "pozos.json";
+        link.click();
+    };
+
+    reader.readAsText(e.target.files[0]);
+});
+</script>
+
+</body>
+</html>
