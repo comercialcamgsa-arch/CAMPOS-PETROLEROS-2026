@@ -1,0 +1,32 @@
+[
+  {
+    "nombre": "Ixachi-1",
+    "operador": "Pemex",
+    "lat": 19.35,
+    "lng": -96.35
+  },
+  {
+    "nombre": "Amoca-2",
+    "operador": "ENI",
+    "lat": 18.40,
+    "lng": -92.20
+  },
+  {
+    "nombre": "Ichalkil-3",
+    "operador": "Fieldwood",
+    "lat": 19.10,
+    "lng": -93.00
+  },
+  {
+    "nombre": "Trion-1",
+    "operador": "Woodside",
+    "lat": 24.20,
+    "lng": -95.10
+  },
+  {
+    "nombre": "Hokchi-4",
+    "operador": "Hokchi",
+    "lat": 18.70,
+    "lng": -92.00
+  }
+]
