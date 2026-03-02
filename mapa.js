@@ -1,14 +1,16 @@
-// =============================
-// VARIABLES GLOBALES
-// =============================
 let map;
 let marcadores = [];
+let markersCampos = [];
+let markersPuertos = [];
 let clusterCampos;
+let bounds;
 
-// =============================
+// ===============================
 // INICIALIZAR MAPA
-// =============================
+// ===============================
 window.initMap = function () {
+
+    bounds = new google.maps.LatLngBounds();
 
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: 6,
@@ -20,139 +22,105 @@ window.initMap = function () {
     cargarPuertos();
 };
 
-// =============================
-// CARGAR CAMPOS / POZOS
-// =============================
+// ===============================
+// CARGAR CAMPOS
+// ===============================
 async function cargarCampos() {
 
-    const respuesta = await fetch("campos.json");
-    const campos = await respuesta.json();
+    const response = await fetch("campos.json");
+    const data = await response.json();
 
-    const markersCampos = [];
-
-    campos.forEach(campo => {
+    data.forEach(campo => {
 
         const marker = new google.maps.Marker({
-            position: { lat: campo.lat, lng: campo.lng },
+            position: {
+                lat: campo.lat,
+                lng: campo.lng
+            },
             title: campo.nombre,
-            icon: iconoOperador(campo.operador)
+            icon: {
+                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+            }
         });
 
         marker.operador = campo.operador;
-        marker.tipo = "campo";
-
-        const info = new google.maps.InfoWindow({
-            content: `
-                <h3>${campo.nombre}</h3>
-                <b>Operador:</b> ${campo.operador}
-            `
-        });
-
-        marker.addListener("click", () => {
-            info.open(map, marker);
-        });
+        marker.setMap(map);
 
         marcadores.push(marker);
         markersCampos.push(marker);
+
+        bounds.extend(marker.getPosition());
     });
 
-    // ===== CLUSTER AUTOMÁTICO =====
     clusterCampos = new markerClusterer.MarkerClusterer({
         map,
         markers: markersCampos
     });
 }
 
-// =============================
+// ===============================
 // CARGAR PUERTOS
-// =============================
-function cargarPuertos() {
+// ===============================
+async function cargarPuertos() {
 
-    puertos.forEach(puerto => {
+    try {
+        const response = await fetch("puertos.json");
+        const data = await response.json();
 
-        const marker = new google.maps.Marker({
-            position: { lat: puerto.lat, lng: puerto.lng },
-            map: map,
-            title: puerto.nombre,
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        data.forEach(puerto => {
+
+            const marker = new google.maps.Marker({
+                position: {
+                    lat: puerto.lat,
+                    lng: puerto.lng
+                },
+                title: puerto.nombre,
+                icon: {
+                    url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                },
+                map: map
+            });
+
+            markersPuertos.push(marker);
+
+            bounds.extend(marker.getPosition());
         });
 
-        marker.tipo = "puerto";
+        // 🔥 AUTO ZOOM GENERAL
+        map.fitBounds(bounds);
 
-        const info = new google.maps.InfoWindow({
-            content: `
-                <h3>${puerto.nombre}</h3>
-                <b>Operadores:</b> ${puerto.operadores}
-            `
-        });
-
-        marker.addListener("click", () => {
-            info.open(map, marker);
-        });
-
-        marcadores.push(marker);
-    });
-}
-
-// =============================
-// FILTRO POR OPERADOR
-// =============================
-function filtrarOperadores() {
-
-    const activos = Array.from(
-        document.querySelectorAll("#panel input:checked")
-    ).map(el => el.value);
-
-    const visibles = [];
-
-    marcadores.forEach(marker => {
-
-        // PUERTOS SIEMPRE VISIBLES
-        if (marker.tipo === "puerto") {
-            marker.setMap(map);
-            return;
-        }
-
-        const visible = activos.some(op =>
-            marker.operador.includes(op)
-        );
-
-        marker.setMap(visible ? map : null);
-
-        if (visible && marker.tipo === "campo") {
-            visibles.push(marker);
-        }
-    });
-
-    // reconstruir cluster
-    if (clusterCampos) {
-        clusterCampos.clearMarkers();
-        clusterCampos.addMarkers(visibles);
+    } catch (error) {
+        console.warn("No se encontró puertos.json (no es obligatorio)");
     }
 }
 
-// =============================
-// ICONOS POR OPERADOR
-// =============================
-function iconoOperador(op) {
+// ===============================
+// FILTRO POR OPERADOR + AUTO ZOOM
+// ===============================
+function filtrarOperador() {
 
-    if (op.includes("Pemex"))
-        return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+    const operadorSeleccionado =
+        document.getElementById("operador").value;
 
-    if (op.includes("ENI"))
-        return "http://maps.google.com/mapfiles/ms/icons/orange-dot.png";
+    const boundsFiltro = new google.maps.LatLngBounds();
+    let visibles = 0;
 
-    if (op.includes("Fieldwood"))
-        return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+    markersCampos.forEach(marker => {
 
-    if (op.includes("Woodside"))
-        return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+        if (
+            operadorSeleccionado === "todos" ||
+            marker.operador === operadorSeleccionado
+        ) {
+            marker.setVisible(true);
+            boundsFiltro.extend(marker.getPosition());
+            visibles++;
+        } else {
+            marker.setVisible(false);
+        }
+    });
 
-    if (op.includes("Hokchi"))
-        return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
-
-    if (op.includes("Murphy"))
-        return "http://maps.google.com/mapfiles/ms/icons/pink-dot.png";
-
-    return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+    // 🔥 ZOOM AUTOMÁTICO SOLO SI HAY RESULTADOS
+    if (visibles > 0) {
+        map.fitBounds(boundsFiltro);
+    }
 }
