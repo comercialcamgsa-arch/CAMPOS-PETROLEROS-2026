@@ -12,7 +12,9 @@ window.initMap = function () {
     cargarPuertos();
 };
 
-// ================= CAMPOS =================
+// =============================
+// CARGAR CAMPOS / POZOS
+// =============================
 async function cargarCampos() {
 
     const respuesta = await fetch("campos.json");
@@ -28,7 +30,7 @@ async function cargarCampos() {
         });
 
         marker.operador = campo.operador;
-        marcadores.push(marker);
+        marker.tipo = "campo";
 
         const info = new google.maps.InfoWindow({
             content: `
@@ -38,10 +40,68 @@ async function cargarCampos() {
         });
 
         marker.addListener("click", () => info.open(map, marker));
+
+        marcadores.push(marker);
     });
 }
 
-// ================= ICONOS =================
+// =============================
+// CARGAR PUERTOS
+// =============================
+function cargarPuertos() {
+
+    puertos.forEach(puerto => {
+
+        const marker = new google.maps.Marker({
+            position: { lat: puerto.lat, lng: puerto.lng },
+            map: map,
+            title: puerto.nombre,
+            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        });
+
+        marker.tipo = "puerto";
+
+        const info = new google.maps.InfoWindow({
+            content: `
+                <h3>${puerto.nombre}</h3>
+                <b>Operadores:</b> ${puerto.operadores}
+            `
+        });
+
+        marker.addListener("click", () => info.open(map, marker));
+
+        marcadores.push(marker);
+    });
+}
+
+// =============================
+// FILTRO POR OPERADOR
+// =============================
+function filtrarOperadores() {
+
+    const activos = Array.from(
+        document.querySelectorAll("#panel input:checked")
+    ).map(el => el.value);
+
+    marcadores.forEach(marker => {
+
+        // puertos siempre visibles
+        if (marker.tipo === "puerto") {
+            marker.setMap(map);
+            return;
+        }
+
+        const visible = activos.some(op =>
+            marker.operador.includes(op)
+        );
+
+        marker.setMap(visible ? map : null);
+    });
+}
+
+// =============================
+// ICONOS POR OPERADOR
+// =============================
 function iconoOperador(op) {
 
     if (op.includes("Pemex"))
@@ -60,34 +120,4 @@ function iconoOperador(op) {
         return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
 
     return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
-}
-
-// ================= PUERTOS =================
-function cargarPuertos() {
-
-    if (typeof puertos === "undefined") {
-        console.warn("puertos.js no cargó");
-        return;
-    }
-
-    puertos.forEach(puerto => {
-
-        const marker = new google.maps.Marker({
-            position: { lat: puerto.lat, lng: puerto.lng },
-            map: map,
-            title: puerto.nombre,
-            icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-        });
-
-        const info = new google.maps.InfoWindow({
-            content: `
-                <h3>${puerto.nombre}</h3>
-                <p><b>Operadores:</b> ${puerto.operadores}</p>
-            `
-        });
-
-        marker.addListener("click", () => {
-            info.open(map, marker);
-        });
-    });
 }
