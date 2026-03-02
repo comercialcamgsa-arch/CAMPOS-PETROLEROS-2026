@@ -1,47 +1,27 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Mapa Petrolero Golfo de México</title>
+<meta charset="utf-8">
+<title>Mapa Petrolero Golfo de México</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-        }
-
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
-    </style>
+<style>
+  #map {
+    height: 100vh;
+    width: 100%;
+  }
+</style>
 </head>
 
 <body>
 
 <div id="map"></div>
 
-<!-- DATOS -->
-<script src="datos.js"></script>
-
-<!-- LOGICA DEL MAPA -->
+<script src="puertos.js"></script>
 <script src="mapa.js"></script>
 
-<!-- GOOGLE MAPS -->
 <script async defer
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxISuoMjIMNpzds2UN_5L1JjAizg_PBtM&callback=initMap">
 </script>
-<select id="filtroOperador">
-  <option value="todos">Todos los operadores</option>
-  <option value="Pemex">Pemex</option>
-  <option value="Eni">Eni</option>
-  <option value="Fieldwood">Fieldwood</option>
-  <option value="Woodside">Woodside</option>
-  <option value="Hokchi">Hokchi</option>
-</select>
 
-iv id="listaPozos"></div>
-    <script src="pozos.js"></script>
-<script src="app.js"></script>
-</body><d
+</body>
 </html>
