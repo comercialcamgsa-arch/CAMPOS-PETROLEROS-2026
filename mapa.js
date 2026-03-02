@@ -32,7 +32,7 @@ async function cargarPozos() {
 
     crearMarcadores(pozos, "Pozo");
 }
-
+marker.operador = item.operador;
 
 // ================= CREAR MARCADORES =================
 function crearMarcadores(datos, tipo) {
@@ -40,10 +40,13 @@ function crearMarcadores(datos, tipo) {
     datos.forEach(item => {
 
         const marker = new google.maps.Marker({
-            position: { lat: item.lat, lng: item.lng },
-            map: map,
-            title: item.nombre,
-            icon: iconoOperador(item.operador)
+    position: { lat: item.lat, lng: item.lng },
+    map: map,
+    title: item.nombre,
+    icon: iconoOperador(item.operador)
+});
+
+marker.operador = item.operador; // 👈 IMPORTANTE
         });
 
         marcadores.push(marker);
@@ -108,4 +111,23 @@ function iconoOperador(op) {
         return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png";
 
     return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+}
+function aplicarFiltros() {
+
+    const checks = document.querySelectorAll("#panel-filtros input");
+
+    const activos = [];
+
+    checks.forEach(c => {
+        if (c.checked) activos.push(c.value);
+    });
+
+    marcadores.forEach(marker => {
+
+        const visible = activos.some(op =>
+            marker.operador.includes(op)
+        );
+
+        marker.setVisible(visible);
+    });
 }
